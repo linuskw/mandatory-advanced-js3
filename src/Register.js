@@ -1,7 +1,6 @@
 import React from 'react';
 import './App.css';
 import axios from 'axios';
-import { token$, updateToken } from './Store.js';
 import { Redirect } from 'react-router-dom';
 
 
@@ -13,6 +12,7 @@ class Register extends React.Component {
       email: "",
       password: "",
       registered: false,
+      valid: true,
     }
 
     this.onChange = this.onChange.bind(this);
@@ -58,7 +58,8 @@ class Register extends React.Component {
           <input type="email" name="email" value={ this.state.email } onChange={ this.onChange } /><br/>
           <input type="password" name="password" value={ this.state.password } onChange={ this.onChange } /><br/>
           <button type="submit">Register</button>
-          </form>
+        </form>
+        <h1>{ !this.state.valid ? "Error when registering" : "" }</h1>
       </>
     )
   }

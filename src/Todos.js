@@ -1,9 +1,8 @@
 import React from 'react';
 import './App.css';
 import axios from 'axios';
-import { token$, updateToken } from './Store.js';
+import { token$ } from './Store.js';
 import jwt from 'jsonwebtoken';
-import { Redirect } from 'react-router-dom';
 
 
 class Todos extends React.Component {
@@ -14,30 +13,36 @@ class Todos extends React.Component {
       email: "",
       content: "",
       todoArray: [],
+      load: true,
+      submit: true,
+      delete: true,
     }
 
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.deleteTodo = this.deleteTodo.bind(this);
+    this.onError = this.onError.bind(this);
   }
 
   componentDidMount(){
-    this.subscription = token$.subscribe((token) => {
-      console.log(token);
-      axios.get('http://3.120.96.16:3002/todos', {
-        headers: {
-          Authorization: 'Bearer ' + token,
-        },
-      })
-      .then((response) => {
-        console.log(response);
-        this.setState({ todoArray: response.data.todos })
-        const decoded = jwt.decode(token);
-        console.log(decoded);
-        this.setState({ email: decoded.email })
-    }).catch((err) => {
-      console.log(err);
+    axios.get('http://3.120.96.16:3002/todos', {
+      headers: {
+        Authorization: 'Bearer ' + token$.value,
+      },
     })
+    .then((response) => {
+      console.log(response);
+      this.setState({ todoArray: response.data.todos })
+      const decoded = jwt.decode(token$.value);
+      console.log(decoded);
+      this.setState({ email: decoded.email })
+  }).catch((error) => {
+    console.log(error);
+    if (error.response.status === 401) {
+      this.setState({ load: false })
+    } else if (error.response.status === 400) {
+      this.setState({ load: false })
+    }
   })
 }
 
@@ -56,6 +61,12 @@ class Todos extends React.Component {
       console.log("success");
       this.componentDidMount();
       this.setState({ content: "" })
+    }).catch((error) => {
+      if (error.response.status === 401) {
+        this.setState({ submit: false })
+      } else if (error.response.status === 400) {
+        this.setState({ submit: false })
+      }
     })
   }
 
@@ -70,9 +81,29 @@ class Todos extends React.Component {
         console.log("deleted");
         this.componentDidMount();
       })
-      .catch((err) => {
-        console.log(err);
+      .catch((error) => {
+        if (error.response.status === 401) {
+          this.setState({ delete: false })
+        } else if (error.response.status === 400) {
+          this.setState({ delete: false })
+        }
       })
+  }
+
+  onError(){
+    if (!this.state.load) {
+      return(
+        <h1>Error when loading todos</h1>
+      )
+    } else if (!this.state.submit) {
+      return(
+        <h1>Error when submitting todo</h1>
+      )
+    } else if (!this.state.delete) {
+      return(
+        <h1>Error when deleting todo</h1>
+      )
+    }
   }
 
   renderTodos(){
@@ -84,7 +115,7 @@ class Todos extends React.Component {
           <td>
             <button id={ id } onClick={ this.deleteTodo }>Delete</button>
           </td>
-          </tr>
+        </tr>
       )
     })
   }
@@ -95,12 +126,15 @@ class Todos extends React.Component {
       <>
         <h1>{ this.state.email }</h1>
         <table>
-          { this.renderTodos() }
+          <tbody>
+            { this.renderTodos() }
+          </tbody>
         </table>
         <form onSubmit={ this.onSubmit }>
           <input type="text" onChange={ this.onChange } value={ this.state.content } />
           <input type="submit" />
         </form>
+        { this.onError() }
       </>
     )
   }
