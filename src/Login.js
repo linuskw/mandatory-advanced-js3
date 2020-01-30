@@ -1,8 +1,9 @@
 import React from 'react';
 import './App.css';
 import axios from 'axios';
-import { updateToken } from './Store.js';
-import { Redirect } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
+import { token$, updateToken } from './Store.js';
+import jwt from 'jsonwebtoken';
 
 
 class Login extends React.Component {
@@ -11,6 +12,7 @@ class Login extends React.Component {
 
     this.state = {
       email: "",
+      emailLoggedIn: "",
       password: "",
       loggedin: false,
       valid: true,
@@ -18,6 +20,29 @@ class Login extends React.Component {
 
     this.onChange = this.onChange.bind(this);
     this.formLogin = this.formLogin.bind(this);
+    this.logOut = this.logOut.bind(this);
+  }
+
+  componentDidMount(){
+    axios.get('http://3.120.96.16:3002/todos', {
+      headers: {
+        Authorization: 'Bearer ' + token$.value,
+      },
+    })
+    .then((response) => {
+      console.log(response);
+      this.setState({ todoArray: response.data.todos })
+      const decoded = jwt.decode(token$.value);
+      console.log(decoded);
+      this.setState({ emailLoggedIn: decoded.email })
+    }).catch((error) => {
+      console.log(error);
+      if (error.response.status === 401) {
+        this.setState({ load: false })
+      } else if (error.response.status === 400) {
+        this.setState({ load: false })
+      }
+    })
   }
 
   onChange(e){
@@ -48,12 +73,27 @@ class Login extends React.Component {
    })
   }
 
+  logOut(){
+    console.log("logout");
+    updateToken("");
+    localStorage.removeItem('token')
+    this.setState({ loggedout: true })
+  }
+
   render(){
     if (this.state.loggedin) {
       return <Redirect to="/todos" />
     }
     return(
       <>
+      <header>
+        <h1>Login</h1>
+        <h2>{ this.state.emailLoggedIn }</h2>
+        <Link to={ '/login' }><button >Login</button></Link>
+        <Link to={ '/register' }><button >Register</button></Link>
+        <Link to={ '/todos' }><button >Todo list</button></Link>
+        <Link to={ '/login' }><button onClick={ this.logOut }>Logout</button></Link>
+      </header>
         <form onSubmit={ this.formLogin }>
           <input type="email" name="email" value={ this.state.email } onChange={ this.onChange } /><br/>
           <input type="password" name="password" value={ this.state.password } onChange={ this.onChange } /><br/>

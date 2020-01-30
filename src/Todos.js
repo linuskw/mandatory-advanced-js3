@@ -1,7 +1,8 @@
 import React from 'react';
 import './App.css';
 import axios from 'axios';
-import { token$ } from './Store.js';
+import { token$, updateToken } from './Store.js';
+import { Link, Redirect } from 'react-router-dom';
 import jwt from 'jsonwebtoken';
 
 
@@ -22,6 +23,7 @@ class Todos extends React.Component {
     this.onSubmit = this.onSubmit.bind(this);
     this.deleteTodo = this.deleteTodo.bind(this);
     this.onError = this.onError.bind(this);
+    this.logOut = this.logOut.bind(this);
   }
 
   componentDidMount(){
@@ -36,15 +38,15 @@ class Todos extends React.Component {
       const decoded = jwt.decode(token$.value);
       console.log(decoded);
       this.setState({ email: decoded.email })
-  }).catch((error) => {
-    console.log(error);
-    if (error.response.status === 401) {
-      this.setState({ load: false })
-    } else if (error.response.status === 400) {
-      this.setState({ load: false })
-    }
-  })
-}
+    }).catch((error) => {
+      console.log(error);
+      if (error.response.status === 401) {
+        this.setState({ load: false })
+      } else if (error.response.status === 400) {
+        this.setState({ load: false })
+      }
+    })
+  }
 
   onChange(e){
     this.setState({ content: e.target.value })
@@ -58,6 +60,7 @@ class Todos extends React.Component {
       },
     })
     .then((response) => {
+      console.log(response);
       console.log("success");
       this.componentDidMount();
       this.setState({ content: "" })
@@ -120,11 +123,24 @@ class Todos extends React.Component {
     })
   }
 
+  logOut(){
+    console.log("logout");
+    updateToken("");
+    localStorage.removeItem('token');
+    this.setState({ loggedout: true })
+  }
+
   render(){
-    console.log(this.state.todoArray);
     return(
       <>
-        <h1>{ this.state.email }</h1>
+      <header>
+        <h1>Todo list</h1>
+        <h2>{ this.state.email }</h2>
+        <Link to={ '/login' }><button >Login</button></Link>
+        <Link to={ '/register' }><button >Register</button></Link>
+        <Link to={ '/todos' }><button >Todo list</button></Link>
+        <Link to={ '/login' }><button onClick={ this.logOut }>Logout</button></Link>
+      </header>
         <table>
           <tbody>
             { this.renderTodos() }
