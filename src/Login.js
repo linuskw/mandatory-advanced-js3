@@ -90,7 +90,7 @@ class Login extends React.Component {
         <h1>Login</h1>
         <h2>{ this.state.emailLoggedIn }</h2>
         <Link to={ '/login' }><button >Login</button></Link>
-        <Link to={ '/register' }><button >Register</button></Link>
+        <Link to={ '/' }><button >Register</button></Link>
         <Link to={ '/todos' }><button >Todo list</button></Link>
         <Link to={ '/login' }><button onClick={ this.logOut }>Logout</button></Link>
       </header>
