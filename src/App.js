@@ -3,10 +3,7 @@ import './App.css';
 import Login from './Login.js';
 import Register from './Register.js';
 import Todos from './Todos.js';
-import axios from 'axios';
-import { token$ } from './Store.js';
-import jwt from 'jsonwebtoken';
-import { Link, Route, Redirect, BrowserRouter as Router } from 'react-router-dom';
+import { Route, BrowserRouter as Router } from 'react-router-dom';
 
 
 class App extends React.Component {

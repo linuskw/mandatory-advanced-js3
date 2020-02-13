@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css';
 import axios from 'axios';
 import { token$, updateToken } from './Store.js';
-import { Link, Redirect } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import jwt from 'jsonwebtoken';
 
 
@@ -17,6 +17,7 @@ class Todos extends React.Component {
       load: true,
       submit: true,
       delete: true,
+      contentColor: "black",
     }
 
     this.onChange = this.onChange.bind(this);
@@ -50,6 +51,9 @@ class Todos extends React.Component {
 
   onChange(e){
     this.setState({ content: e.target.value })
+    if (e.target.value.length > 100) {
+      this.setState({ contentColor: "red" })
+    }
   }
 
   onSubmit(e){
@@ -134,23 +138,26 @@ class Todos extends React.Component {
     return(
       <>
       <header>
-        <h1>Todo list</h1>
-        <h2>{ this.state.email }</h2>
         <Link to={ '/login' }><button >Login</button></Link>
         <Link to={ '/' }><button >Register</button></Link>
         <Link to={ '/todos' }><button >Todo list</button></Link>
         <Link to={ '/login' }><button onClick={ this.logOut }>Logout</button></Link>
+        <h1>Todo list</h1>
+        <h2>{ this.state.email }</h2>
       </header>
+      <div>
+        <form onSubmit={ this.onSubmit }>
+          <input type="text" onChange={ this.onChange } value={ this.state.content } />
+          <input type="submit" />
+          <label style={{ color: this.state.contentColor, marginLeft: 10 }}>{ this.state.content.length }/100</label>
+        </form>
         <table>
           <tbody>
             { this.renderTodos() }
           </tbody>
         </table>
-        <form onSubmit={ this.onSubmit }>
-          <input type="text" onChange={ this.onChange } value={ this.state.content } />
-          <input type="submit" />
-        </form>
         { this.onError() }
+      </div>
       </>
     )
   }

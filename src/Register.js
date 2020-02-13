@@ -103,19 +103,21 @@ class Register extends React.Component {
     return(
       <>
       <header>
-        <h1>Register</h1>
-        <h2>{ this.state.emailLoggedIn }</h2>
         <Link to={ '/login' }><button >Login</button></Link>
         <Link to={ '/' }><button >Register</button></Link>
         <Link to={ '/todos' }><button >Todo list</button></Link>
         <Link to={ '/login' }><button onClick={ this.logOut }>Logout</button></Link>
+        <h1>Register</h1>
+        <h2>{ this.state.emailLoggedIn }</h2>
       </header>
+      <div>
         <form onSubmit={ this.formRegister }>
           <input type="email" name="email" value={ this.state.email } onChange={ this.onChange } /><br/>
           <input type="password" name="password" value={ this.state.password } onChange={ this.onChange } /><br/>
           <button type="submit">Register</button>
         </form>
-        <h1>{ !this.state.valid ? "Error when registering" : "" }</h1>
+        <h1>{ !this.state.valid ? "User already exists" : "" }</h1>
+      </div>
       </>
     )
   }

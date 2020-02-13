@@ -87,19 +87,21 @@ class Login extends React.Component {
     return(
       <>
       <header>
-        <h1>Login</h1>
-        <h2>{ this.state.emailLoggedIn }</h2>
         <Link to={ '/login' }><button >Login</button></Link>
         <Link to={ '/' }><button >Register</button></Link>
         <Link to={ '/todos' }><button >Todo list</button></Link>
         <Link to={ '/login' }><button onClick={ this.logOut }>Logout</button></Link>
+        <h1>Login</h1>
+        <h2>{ this.state.emailLoggedIn }</h2>
       </header>
+      <div>
         <form onSubmit={ this.formLogin }>
           <input type="email" name="email" value={ this.state.email } onChange={ this.onChange } /><br/>
           <input type="password" name="password" value={ this.state.password } onChange={ this.onChange } /><br/>
           <button type="submit">Login</button>
         </form>
-        <h1>{ !this.state.valid ? "Error logging in" : "" }</h1>
+        <h1>{ !this.state.valid ? "Wrong credentials" : "" }</h1>
+      </div>
       </>
     )
   }
